@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <title>Employee Data</title>
+</head>
+
+<body>
+    <div class="jumbotron">
+        <h1 class=" display-4 mainTitle">Employee Data Management</h1>
+    </div>
+
+    <div class="card">
+        <h5 class="card-header">Employee Data</h5>
+        <div class="card-body">
+                <form>
+                    <div class="form-group searchTerm">
+                        <label for="employeeName">Employee Name:</label>
+                        <input type="text" class="form-control" id="employeeName">
+                    </div>
+                    <div class="form-group numberRecord">
+                        <label for="role">Role:</label>
+                        <input type="text" class="form-control" id="role">
+                    </div>
+                    <div class="form-group startYear">
+                            <label for="startDate">Start Date (MM/DD/YYYY)</label>
+                            <input type="text" class="form-control" id="startDate">
+                        </div>
+                        <div class="form-group EndYear">
+                            <label for="monthlyRate">Monthly Rate</label>
+                            <input type="text" class="form-control" id="monthlyRate">
+                        </div>
+                </form>
+
+            <a href="#" class="btn btn-primary" id="submitButton">Submit</a>
+            <a href="#" class="btn btn-primary" id="clearButton">Clear</a>
+        </div>
+    </div>
+
+    <div class="card card2">
+        <h5 class="card-header">Current Employees</h5>
+        <div class="card-body" id="results">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Employee Name</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Start Date</th>
+                        <th scope="col">Months Worked</th>
+                        <th scope="col">Monthly Rate ($)</th>
+                        <th scope="col">Total Billed ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- This HTML to be created dynamically -->
+                    <tr>
+                        <td>Mark Chernick</td>
+                        <td>CEO</td>
+                        <td>06/12/1991</td>
+                        <td>43</td>
+                        <td>22400</td>
+                        <td>2358000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        
+        var employeeName = $("#employeeName").val();
+        var role = $("#role").val();
+        var startDate = $("#startDate").val();
+        var monthlyRate = $("#monthlyRate").val();
+
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyDgKmB8p6TjDPQ7v89KSPDcIw0Rk9eXHyw",
+            authDomain: "employeedatamgmt-9168b.firebaseapp.com",
+            databaseURL: "https://employeedatamgmt-9168b.firebaseio.com",
+            projectId: "employeedatamgmt-9168b",
+            storageBucket: "",
+            messagingSenderId: "27645932124"
+        };
+
+        firebase.initializeApp(config);
+
+        var database = firebase.database();
+
+        database.ref().on("child_added", function(snapshot) {
+
+            console.log("This DB event function is firing");
+
+            //dynamically created the HTML
+            var tableBody = $("#tableBody")
+            var newTable = $("<tr>");
+            var tdEmployeeName = $("<td>");
+            var tdRole = $("<td>");
+            var tdStartDate = $("<td>");
+            var tdMonthsWorked = $("<td>");
+            var tdMonthlyRate = $("<td>");
+            var tdTotalBilled = $("<td>");
+
+            //Append all of the newly created divs to the right place
+            tableBody.append(newTable);
+            newTable.append(tdEmployeeName);
+            newTable.append(tdRole);
+            newTable.append(tdStartDate);
+            newTable.append(tdMonthsWorked);
+            newTable.append(tdMonthlyRate);
+            newTable.append(tdTotalBilled);
+
+            //Store what you get back from the DB
+            employeeNameDB = snapshot.val().employeeName;
+            roleDB = snapshot.val().role;
+            startDateDB = snapshot.val().startDate;
+            monthlyRateDB = snapshot.val().monthlyRate;
+            
+            //Add it to the HTML
+            tdEmployeeName.text(employeeNameDB);
+            tdRole.text(roleDB);
+            tdStartDate.text(startDateDB);
+            tdMonthlyRate.text(monthlyRateDB);
+
+        }, function(errorObject) {
+        console.log("The read failed: " + errorObject.code);
+        });
+
+        $("#submitButton").on("click", function(event) {
+
+            employeeName = $("#employeeName").val();
+            role = $("#role").val();
+            startDate = $("#startDate").val();
+            monthlyRate = $("#monthlyRate").val();
+
+            console.log(employeeName);
+            console.log(role);
+            console.log(startDate);
+            console.log(monthlyRate);
+
+            database.ref().push({
+                employeeName: employeeName,
+                role: role,
+                startDate: startDate,
+                monthlyRate: monthlyRate,
+                dateAdded: firebase.database.ServerValue.TIMESTAMP
+            });
+
+        });
+
+        $("#clearButton").on("click", function(event) {
+            employeeName = $("#employeeName").val("");
+            role = $("#role").val("");
+            startDate = $("#startDate").val("");
+            monthlyRate = $("#monthlyRate").val("");
+        });
+
+
+    
+    </script>
+
+
+
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+</body>
+</html>
