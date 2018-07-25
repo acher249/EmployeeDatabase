@@ -126,11 +126,13 @@
             monthlyRateDB = snapshot.val().monthlyRate;
 
             //calculate months worked
-            console.log(startDate);
             var momentFormat = "MM/DD/YYYY";
             var convertedDate = moment(startDateDB, momentFormat);
             var monthsWorked = moment(convertedDate).diff(moment(), "months");
             var monthsWorked = -monthsWorked;
+
+            //calculate total $ billed
+            var totalBilled = monthsWorked * monthlyRateDB;
             
             //Add the DB data to the HTML
             tdEmployeeName.text(employeeNameDB);
@@ -138,6 +140,7 @@
             tdStartDate.text(startDateDB);
             tdMonthlyRate.text(monthlyRateDB);
             tdMonthsWorked.text(monthsWorked);
+            tdTotalBilled.text(totalBilled);
 
         }, function(errorObject) {
         console.log("The read failed: " + errorObject.code);
